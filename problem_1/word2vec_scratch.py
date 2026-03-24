@@ -4,9 +4,11 @@ import torch.nn.functional as F
 import torch.optim as optim
 from collections import Counter
 import numpy as np
-import json
 import os
 import itertools
+from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
 
 # --- 1. DATASET & VOCABULARY PREPARATION ---
 
@@ -100,10 +102,10 @@ class CBOWModel(nn.Module):
 
         return torch.mean(pos_loss + neg_loss)
 
-# --- 3. EVALUATION FUNCTION ---
+# --- 3. EVALUATION & SEMANTIC ANALYSIS FUNCTIONS ---
 
 def get_similar_words(model, word2idx, idx2word, target_word, top_k=5):
-    """Calculates cosine similarity to find the nearest neighbors of a word."""
+    """TASK 3.1: Calculates cosine similarity to find the nearest neighbors."""
     if target_word not in word2idx:
         return f"'{target_word}' is not in the vocabulary."
     
@@ -122,7 +124,76 @@ def get_similar_words(model, word2idx, idx2word, target_word, top_k=5):
         
     return results
 
-# --- 4. TRAINING & EXPERIMENT PIPELINE ---
+def get_analogy(model, word2idx, idx2word, word_a, word_b, word_c, top_k=1):
+    """TASK 3.2: Solves analogies of the form: A is to B as C is to ?"""
+    if word_a not in word2idx or word_b not in word2idx or word_c not in word2idx:
+        return f"Missing vocabulary for analogy: {word_a}:{word_b} :: {word_c}:?"
+    
+    embeddings = model.in_embed.weight.data
+    
+    v_a = embeddings[word2idx[word_a]]
+    v_b = embeddings[word2idx[word_b]]
+    v_c = embeddings[word2idx[word_c]]
+    
+    target_vec = v_b - v_a + v_c
+    
+    similarities = F.cosine_similarity(target_vec.unsqueeze(0), embeddings)
+    top_scores, top_indices = torch.topk(similarities, top_k + 4)
+    
+    results = []
+    for i in range(len(top_indices)):
+        idx = top_indices[i].item()
+        word = idx2word[idx]
+        
+        if word not in [word_a, word_b, word_c]:
+            score = top_scores[i].item()
+            results.append((word, round(score, 4)))
+            if len(results) == top_k:
+                break
+                
+    return results
+
+# --- 4. VISUALIZATION FUNCTION ---
+
+def visualize_embeddings(model, word2idx, words_to_visualize, filename="embeddings_2d.png", method='tsne'):
+    """TASK 4: Reduces word embeddings to 2D and plots them."""
+    vectors = []
+    valid_words = []
+    
+    for word in words_to_visualize:
+        if word in word2idx:
+            vectors.append(model.in_embed.weight.data[word2idx[word]].cpu().numpy())
+            valid_words.append(word)
+            
+    if len(valid_words) < 5:
+        print("Not enough valid words found in vocabulary to visualize.")
+        return
+        
+    vectors = np.array(vectors)
+    
+    if method == 'tsne':
+        perplexity = min(30, len(valid_words) - 1)
+        reducer = TSNE(n_components=2, perplexity=perplexity, random_state=42)
+    elif method == 'pca':
+        reducer = PCA(n_components=2)
+    else:
+        raise ValueError("Method must be 'tsne' or 'pca'")
+        
+    reduced_vectors = reducer.fit_transform(vectors)
+    
+    plt.figure(figsize=(12, 10))
+    for i, word in enumerate(valid_words):
+        x, y = reduced_vectors[i, 0], reduced_vectors[i, 1]
+        plt.scatter(x, y, color='blue', alpha=0.6)
+        plt.text(x + 0.02, y + 0.02, word, fontsize=10, alpha=0.8)
+        
+    plt.title(f"2D Word Embeddings Visualization ({method.upper()})", fontsize=16)
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.tight_layout()
+    plt.savefig(filename)
+    print(f"Saved visualization to {filename}")
+
+# --- 5. TRAINING PIPELINE ---
 
 def train_word2vec(data_loader, model_type="skipgram", embed_dim=50, window_size=2, num_neg_samples=5, epochs=3, batch_size=512, lr=0.01):
     
@@ -154,48 +225,65 @@ def train_word2vec(data_loader, model_type="skipgram", embed_dim=50, window_size
     return model
 
 if __name__ == "__main__":
-    data_file = "cleaned_tokens.json"
+    data_file = "corpus.txt"
     
     if not os.path.exists(data_file):
         print(f"Error: {data_file} not found. Please run your preparation script to generate it.")
     else:
         print(f"Loading data from {data_file}...")
-        with open(data_file, "r") as f:
-            real_tokens = json.load(f)
+        with open(data_file, "r", encoding="utf-8") as f:
+            # Read the entire text and split by whitespace to get the tokens
+            text = f.read()
+            real_tokens = text.split()
             
-        # Initialize data loader once to save time
+        # Initialize data loader
         data_loader = Word2VecData(real_tokens)
         
         # Define hyperparameter grid for the report
         model_types = ["skipgram", "cbow"]
         embed_dims = [50]
         window_sizes = [2, 4]
-        neg_samples = [5, 10]
+        neg_samples = [5]
         
-        # Choose a few test words relevant to an academic corpus to evaluate semantic clustering
-        test_words = ["student", "research", "course", "phd", "exam"]
+        eval_words = ["research", "student", "phd", "exam"]
         
+        words_to_plot = ["research", "student", "phd", "exam", "course", "faculty", "btech", "mtech", 
+                         "ug", "pg", "institute", "technology", "science", "engineering", "computer",
+                         "semester", "grade", "hostel", "fee", "admission", "project", "thesis"]
+        
+        analogies = [
+            ("pg", "mtech", "phd"),           
+            ("student", "course", "faculty"),
+            ("science", "technology", "computer")
+        ]
+
         print("\n" + "="*50)
-        print("STARTING HYPERPARAMETER EXPERIMENTS")
+        print("STARTING TRAINING AND EVALUATION")
         print("="*50)
 
-        # Loop through all combinations of hyperparameters
         for m_type, dim, win, neg in itertools.product(model_types, embed_dims, window_sizes, neg_samples):
             print(f"\nTraining Model: {m_type.upper()} | Dim: {dim} | Window: {win} | Neg_Samples: {neg}")
             
-            # Train the model
             trained_model = train_word2vec(
                 data_loader=data_loader,
                 model_type=m_type, 
                 embed_dim=dim, 
                 window_size=win, 
                 num_neg_samples=neg,
-                epochs=3  # Keep epochs low while testing the grid, increase for final run
+                epochs=5  
             )
             
-            # Evaluate using Cosine Similarity immediately after training
-            print("  Evaluation (Nearest Neighbors):")
-            for word in test_words:
+            print("\n  Task 3.1: Top 5 Nearest Neighbors:")
+            for word in eval_words:
                 if word in data_loader.word2idx:
-                    neighbors = get_similar_words(trained_model, data_loader.word2idx, data_loader.idx2word, word, top_k=3)
+                    neighbors = get_similar_words(trained_model, data_loader.word2idx, data_loader.idx2word, word, top_k=5)
                     print(f"    '{word}' -> {neighbors}")
+            
+            print("\n  Task 3.2: Analogy Experiments:")
+            for w_a, w_b, w_c in analogies:
+                analogy_result = get_analogy(trained_model, data_loader.word2idx, data_loader.idx2word, w_a, w_b, w_c, top_k=3)
+                print(f"    {w_a} : {w_b} :: {w_c} : ? -> {analogy_result}")
+                
+            print("\n  Task 4: Generating Visualization...")
+            filename = f"visualization_{m_type}_w{win}.png"
+            visualize_embeddings(trained_model, data_loader.word2idx, words_to_plot, filename=filename, method='tsne')

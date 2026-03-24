@@ -1,0 +1,88 @@
+Loading data from corpus.txt...
+Building vocabulary...
+Vocabulary Size: 1447
+Total words in processed data: 39054
+
+==================================================
+STARTING TRAINING AND EVALUATION
+==================================================
+
+Training Model: SKIPGRAM | Dim: 50 | Window: 2 | Neg_Samples: 5
+  Epoch 1/5 | Avg Loss: 11.1265
+  Epoch 2/5 | Avg Loss: 4.2266
+  Epoch 3/5 | Avg Loss: 2.6694
+  Epoch 4/5 | Avg Loss: 2.1537
+  Epoch 5/5 | Avg Loss: 1.8886
+
+  Task 3.1: Top 5 Nearest Neighbors:
+    'research' -> [('postgraduate', 0.5788), ('professionals', 0.5612), ('oe', 0.5523), ('academics', 0.5479), ('computer', 0.5415)]
+    'student' -> [('semester', 0.5828), ('opted', 0.5734), ('resourcescentral', 0.5707), ('advance', 0.5274), ('programspostgraduate', 0.5227)]
+    'phd' -> [('st', 0.5306), ('centers', 0.4901), ('note', 0.4882), ('inter', 0.4676), ('registered', 0.4644)]
+
+  Task 3.2: Analogy Experiments:
+    pg : mtech :: phd : ? -> [('registered', 0.4725), ('termination', 0.4367), ('full', 0.4276)]
+    student : course :: faculty : ? -> [('advertisement', 0.5364), ('facilityoffice', 0.5075), ('alive', 0.4537)]
+    science : technology :: computer : ? -> [('ai', 0.549), ('varanasi', 0.5202), ('principal', 0.5041)]
+
+  Task 4: Generating Visualization...
+Saved visualization to visualization_skipgram_w2.png
+
+Training Model: SKIPGRAM | Dim: 50 | Window: 4 | Neg_Samples: 5
+  Epoch 1/5 | Avg Loss: 8.1201
+  Epoch 2/5 | Avg Loss: 2.9183
+  Epoch 3/5 | Avg Loss: 2.2361
+  Epoch 4/5 | Avg Loss: 1.9829
+  Epoch 5/5 | Avg Loss: 1.8619
+
+  Task 3.1: Top 5 Nearest Neighbors:
+    'research' -> [('area', 0.5872), ('projects', 0.5421), ('dr', 0.5298), ('dst', 0.5287), ('field', 0.5282)]
+    'student' -> [('iitjoutstanding', 0.7875), ('projectsplacementsalumniteamsphd', 0.7133), ('chapter', 0.6646), ('achievements', 0.6433), ('studentsacm', 0.6258)]
+    'phd' -> [('teams', 0.6473), ('jodhpur', 0.5314), ('eventswebinarsstudents', 0.5243), ('computing', 0.5217), ('alumni', 0.5094)]
+
+  Task 3.2: Analogy Experiments:
+    pg : mtech :: phd : ? -> [('july', 0.4677), ('example', 0.4528), ('introduction', 0.4459)]
+    student : course :: faculty : ? -> [('pursue', 0.4564), ('join', 0.4362), ('mind', 0.4208)]
+    science : technology :: computer : ? -> [('department', 0.5571), ('university', 0.5568), ('ropar', 0.552)]
+
+  Task 4: Generating Visualization...
+Saved visualization to visualization_skipgram_w4.png
+
+Training Model: CBOW | Dim: 50 | Window: 2 | Neg_Samples: 5
+  Epoch 1/5 | Avg Loss: 8.5036
+  Epoch 2/5 | Avg Loss: 5.8066
+  Epoch 3/5 | Avg Loss: 3.6113
+  Epoch 4/5 | Avg Loss: 2.5607
+  Epoch 5/5 | Avg Loss: 2.0352
+
+  Task 3.1: Top 5 Nearest Neighbors:
+    'research' -> [('bioengineering', 0.5161), ('theory', 0.5138), ('conferences', 0.5086), ('credit', 0.4816), ('calculated', 0.4798)]
+    'student' -> [('academicsundergraduate', 0.5447), ('submission', 0.5342), ('practice', 0.5116), ('presentation', 0.4905), ('agreement', 0.4739)]
+    'phd' -> [('facilityoffice', 0.5088), ('contact', 0.4807), ('competent', 0.4727), ('care', 0.459), ('reason', 0.4538)]
+
+  Task 3.2: Analogy Experiments:
+    pg : mtech :: phd : ? -> [('competent', 0.5306), ('reconsideration', 0.442), ('whenever', 0.4112)]
+    student : course :: faculty : ? -> [('fails', 0.4946), ('fees', 0.4824), ('conducted', 0.4639)]
+    science : technology :: computer : ? -> [('systems', 0.4931), ('third', 0.4021), ('foreign', 0.3904)]
+
+  Task 4: Generating Visualization...
+Saved visualization to visualization_cbow_w2.png
+
+Training Model: CBOW | Dim: 50 | Window: 4 | Neg_Samples: 5
+  Epoch 1/5 | Avg Loss: 6.8031
+  Epoch 2/5 | Avg Loss: 4.4342
+  Epoch 3/5 | Avg Loss: 2.9102
+  Epoch 4/5 | Avg Loss: 2.2859
+  Epoch 5/5 | Avg Loss: 1.8970
+
+  Task 3.1: Top 5 Nearest Neighbors:
+    'research' -> [('hours', 0.5767), ('records', 0.4788), ('ng', 0.4269), ('opportunities', 0.4212), ('associated', 0.4143)]
+    'student' -> [('program', 0.5507), ('contact', 0.5486), ('evaluation', 0.5255), ('admission', 0.5063), ('collaborators', 0.4809)]
+    'phd' -> [('students', 0.5221), ('departments', 0.4965), ('per', 0.4704), ('followed', 0.4634), ('hindu', 0.4309)]
+
+  Task 3.2: Analogy Experiments:
+    pg : mtech :: phd : ? -> [('broad', 0.5305), ('officesadministrative', 0.4697), ('participate', 0.4505)]
+    student : course :: faculty : ? -> [('events', 0.4639), ('period', 0.4599), ('sub', 0.4516)]
+    science : technology :: computer : ? -> [('degree', 0.4988), ('people', 0.3904), ('sessions', 0.3868)]
+
+  Task 4: Generating Visualization...
+Saved visualization to visualization_cbow_w4.png

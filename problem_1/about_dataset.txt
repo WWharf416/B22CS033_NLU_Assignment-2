@@ -1,6 +1,0 @@
-==============================
-DATASET STATISTICS
-==============================
-Total Number of Documents Processed: 44
-Total Number of Tokens: 43577
-Vocabulary Size (Unique Tokens): 3738

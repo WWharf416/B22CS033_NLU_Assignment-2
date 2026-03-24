@@ -61,7 +61,7 @@ def preprocess_text(text):
     # Step 3: Tokenization
     tokens = word_tokenize(text)
     
-    # Optional Step 4: Remove common English stopwords so they don't dominate the word cloud
+    # Step 4: Remove common English stopwords so they don't dominate the word cloud
     # (Words like 'the', 'and', 'is', 'of')
     stop_words = set(stopwords.words('english'))
     clean_tokens = [word for word in tokens if word not in stop_words and len(word) > 1]
