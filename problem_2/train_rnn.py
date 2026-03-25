@@ -35,7 +35,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.005)
 criterion = nn.CrossEntropyLoss(ignore_index=char_to_idx['<PAD>'])
 
 print(f"Training Vanilla RNN on {device}...")
-for epoch in range(10): # 10 epochs
+for epoch in range(15):
     total_loss = 0
     random.shuffle(names)
     for name in names:
@@ -49,7 +49,7 @@ for epoch in range(10): # 10 epochs
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-    print(f"Epoch {epoch+1}/10 | Loss: {total_loss/len(names):.4f}")
+    print(f"Epoch {epoch+1:02d} | Loss: {total_loss/len(names):.4f}")
 
 # --- Generation ---
 print("Generating 1000 names...")
@@ -60,7 +60,7 @@ with torch.no_grad():
         current_char = torch.tensor([[char_to_idx['<SOS>']]], device=device)
         hidden = None
         name_chars = []
-        for _ in range(15): # Max length 15
+        for _ in range(15):
             logits, hidden = model(current_char, hidden)
             probs = F.softmax(logits[:, -1, :], dim=-1).squeeze()
             next_char_idx = torch.multinomial(probs, 1).item()
