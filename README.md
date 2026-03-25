@@ -2,8 +2,10 @@
 
 ## Prerequisites
 * **Python 3.12+**
-* **Install dependencies:** ```bash
-  pip install -r problem_1/requirements.txt scikit-learn torch
+* **Install dependencies:** 
+```bash
+pip install -r problem_1/requirements.txt scikit-learn torch
+```
 
 
 ## Problem 1: Word2Vec
