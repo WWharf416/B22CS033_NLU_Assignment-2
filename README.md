@@ -1,11 +1,10 @@
-```markdown
 # NLU Assignment 2
 
 ## Prerequisites
 * **Python 3.12+**
 * **Install dependencies:** ```bash
   pip install -r problem_1/requirements.txt scikit-learn torch
-  ```
+
 
 ## Problem 1: Word2Vec
 
@@ -39,5 +38,4 @@ python train_attention.py
 
 # 2. Evaluate novelty and diversity
 python evaluate.py
-```
 ```
